@@ -1,0 +1,23 @@
+workflows:
+  default-workflow:
+    name: Testing workflow
+    environment:
+      flutter: stable
+    cache:
+      cache_paths:
+      - $FCI_BUILD_DIR/build
+    triggering:
+      events:
+      - push
+      - pull_request
+      branch_patterns:
+      - pattern: "*"
+        include: true
+        source: true
+    scripts:
+    - flutter packages pub get
+    - flutter test --coverage
+    - flutter pub global activate remove_from_coverage
+    - flutter pub global run remove_from_coverage:remove_from_coverage -f coverage/lcov.info -r '.g.dart,license.dart,_router.dart,current_player.dart,bottom_bar.dart,connection_contract.dart,custom_image.dart,neumorfism.dart,notification_subscription_contract.dart,player_view.dart,top_bar.dart$'
+    artifacts:
+    - coverage/lcov.info
